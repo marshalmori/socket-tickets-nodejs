@@ -11,6 +11,30 @@ const socketController = (socket) => {
 
     //TODO: notificar que tem um novo ticket pendente
   });
+
+  socket.on("atender-ticket", ({ escritorio }, callback) => {
+    if (!escritorio) {
+      return callback({
+        ok: false,
+        msg: "A mesa é obrigatória.",
+      });
+    }
+
+    const ticket = ticketControl.atenderTicket(escritorio);
+
+    // TODO: Notificar mudanças nos últimos 4 tickets
+    if (!ticket) {
+      callback({
+        ok: false,
+        msg: "Não tem tickets pendentes",
+      });
+    } else {
+      callback({
+        ok: true,
+        ticket,
+      });
+    }
+  });
 };
 
 module.exports = {
