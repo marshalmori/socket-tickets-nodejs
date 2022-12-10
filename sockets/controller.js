@@ -3,14 +3,15 @@ const TicketControl = require("../models/ticket-control");
 const ticketControl = new TicketControl();
 
 const socketController = (socket) => {
+  // Eventos disparam quando um usuário se conecta
   socket.emit("ultimo-ticket", ticketControl.ultimo);
   socket.emit("estado-actual", ticketControl.ultimos4);
+  socket.emit("tickets-pendientes", ticketControl.tickets.length);
 
   socket.on("siguiente-ticket", (payload, callback) => {
     const siguiente = ticketControl.siguiente();
     callback(siguiente);
-
-    //TODO: notificar que tem um novo ticket pendente
+    socket.broadcast.emit("tickets-pendientes", ticketControl.tickets.length);
   });
 
   socket.on("atender-ticket", ({ escritorio }, callback) => {
@@ -23,8 +24,9 @@ const socketController = (socket) => {
 
     const ticket = ticketControl.atenderTicket(escritorio);
 
-    // TODO: Notificar mudanças nos últimos 4 tickets
     socket.broadcast.emit("estado-actual", ticketControl.ultimos4);
+    socket.emit("tickets-pendientes", ticketControl.tickets.length);
+    socket.broadcast.emit("tickets-pendientes", ticketControl.tickets.length);
 
     if (!ticket) {
       callback({
