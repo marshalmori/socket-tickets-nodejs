@@ -43,7 +43,7 @@ class TicketControl {
     fs.writeFileSync(dbPath, JSON.stringify(this.toJson));
   }
 
-  seguiente() {
+  siguiente() {
     this.ultimo += 1;
     const ticket = new Ticket(this.ultimo, null);
     this.tickets.push(ticket);
@@ -67,6 +67,9 @@ class TicketControl {
     if (this.ultimos4.length > 4) {
       this.ultimos4.splice(-1, 1);
     }
+
+    this.guardarDB();
+    return ticket;
   }
 }
 
